@@ -121,16 +121,27 @@ public class interfaz extends javax.swing.JFrame {
 
         /* Create and display the form */
         int numClientes=Integer.parseInt(JOptionPane.showInputDialog("Numero de clientes"));
-        int numConsolas=3;
         ArrayList<cliente> clientes = new ArrayList<>();
         for (int i = 0; i < numClientes; i++) {
             clientes.add(new cliente(("Cliente "+i), (int)(Math.random()*20)+10));
         }
-        ExecutorService executor = Executors.newFixedThreadPool(numConsolas);
+        ExecutorService executor = Executors.newFixedThreadPool(3);
         
         for(cliente cliente:clientes){
             Runnable us = new administracion(cliente);
             executor.execute(us);
+            try {
+                Thread.currentThread().wait(500);
+            } catch (Exception e) {
+            }
+            if(cont<4){
+                Thread.currentThread().setName("hilo"+cont);
+                cont++;
+            }
+            else{
+                cont=0;
+            }
+
         }
         executor.shutdown();
         
@@ -156,16 +167,8 @@ public class interfaz extends javax.swing.JFrame {
             this.cliente=cliente;
         }
         public void run(){
-            try {
-                Thread.currentThread().wait(500);
-            } catch (Exception e) {
-            }
-            if(cont<4){
-                Thread.currentThread().setName("hilo"+cont);
-                cont++;
-            }
             System.out.println("La consola "+Thread.currentThread().getName()+" empezo a ser usada por "+
-                    cliente.getNombre()+" por "+cliente.getTiempo()+" segundos");
+            cliente.getNombre()+" por "+cliente.getTiempo()+" segundos");
             tiempo(cliente);
         }
         public void tiempo(cliente cliente){
@@ -174,28 +177,28 @@ public class interfaz extends javax.swing.JFrame {
                 int avance=(int)(100/x);
                 for (int i = 0; i < x; i++) {
                     int y=avance*i;
-                    if("hilo1".equals(Thread.currentThread().getName().toString())){
+                    if("pool-1-thread-1".equals(Thread.currentThread().getName().toString())){
                         lbl1.setText(cliente.getNombre());
                         bar1.setValue(y);
                     }
-                    if("hilo2".equals(Thread.currentThread().getName().toString())){
+                    if("pool-1-thread-2".equals(Thread.currentThread().getName().toString())){
                         lbl2.setText(cliente.getNombre());
                         bar2.setValue(y);
                     }
-                    if("hilo3".equals(Thread.currentThread().getName().toString())){
+                    if("pool-1-thread-3".equals(Thread.currentThread().getName().toString())){
                         lbl3.setText(cliente.getNombre());
                         bar3.setValue(y);
                     }
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException e) {
-                if("hilo1".equals(Thread.currentThread().getName().toString())){
+                if("pool-1-thread-1".equals(Thread.currentThread().getName().toString())){
                     bar1.setValue(0);
                 }
-                if("hilo2".equals(Thread.currentThread().getName().toString())){
+                if("pool-1-thread-2".equals(Thread.currentThread().getName().toString())){
                     bar2.setValue(0);
                 }
-                if("hilo3".equals(Thread.currentThread().getName().toString())){
+                if("pool-1-thread-3".equals(Thread.currentThread().getName().toString())){
                     bar3.setValue(0);
                 }
                 Thread.currentThread().interrupt();
